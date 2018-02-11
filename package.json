@@ -1,0 +1,19 @@
+{
+  "name": "react-registration-api",
+  "version": "1.0.0",
+  "description": "api for the BBR react-registration api",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon ./server.js"
+  },
+  "author": "Kelly Crowther",
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^1.14.12"
+  },
+  "dependencies": {
+    "body-parser": "^1.18.2",
+    "express": "^4.16.2",
+    "mysql": "^2.15.0"
+  }
+}
