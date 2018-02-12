@@ -4,6 +4,7 @@ var mysql = require('mysql');
 var databaseConfig = require('../../database-connection-config.json');
 var connection = mysql.createConnection(databaseConfig);
 
+// this file pulls all information from the availableActivity table
 
 module.exports = app.get('/', (req, res) => {
     // connect to the database and catch any errors
