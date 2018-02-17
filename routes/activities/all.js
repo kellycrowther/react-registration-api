@@ -1,22 +1,10 @@
 var express = require('express');
 var app = express();
-var mysql = require('mysql');
-var databaseConfig = require('../../database-connection-config.json');
-var connection = mysql.createConnection(databaseConfig);
+var connection = require('../../mysql-server-connection');
 
 // this file pulls all information from the availableActivity table
 
 module.exports = app.get('/', (req, res) => {
-    // connect to the database and catch any errors
-    connection.connect(function (err) {
-        if (err) {
-            console.error('error connecting: ' + err.stack);
-            res.status(500).send(err.stack);
-            return;
-        }
-
-        console.log('connected as id ' + connection.threadId);
-    });
 
     // simple query to make sure we are retrieving data from mysql
     connection.query('SELECT * FROM availableActivity', function (err, rows, fields) {
@@ -32,7 +20,4 @@ module.exports = app.get('/', (req, res) => {
         res.status(200).json(rows);
         // res.send(rows);
     });
-
-    // close the connection 
-    connection.end();
 });

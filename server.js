@@ -3,9 +3,6 @@ var express = require('express'),
     port = process.env.PORT || 3111;
 var router = express.Router();
 var routes = require('./routes');
-var mysql = require('mysql');
-var databaseConfig = require('./database-connection-config.json');
-var connection = mysql.createConnection(databaseConfig);
 
 //  Connect all our routes to our application
 app.use('/', routes);
