@@ -7,7 +7,8 @@ var connection = mysql.createConnection(databaseConfig);
 // don't need to close/end the connection
 connection.connect(function (err) {
   if (err) {
-    console.error('error connecting: ' + err.stack);
+    console.log('Error Connecting - is mySQL running?');
+    console.error('Error Connecting: ' + err.stack);
     res.status(500).send(err.stack);
     return;
   }

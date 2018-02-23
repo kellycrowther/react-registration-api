@@ -24,7 +24,7 @@ module.exports = app.get('/', (req, res) => {
     });
 });
 
-// transform from 0/1 to  false/true respectively
+// transform from 0/1 to false/true respectively
 function transformTrueFalse(data) {
     for (let x = 0; x < data.length; x++) {
         if (data[x].canEdit === 0) {
