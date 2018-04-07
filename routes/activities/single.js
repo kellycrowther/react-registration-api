@@ -6,9 +6,6 @@ var mysql = require('mysql');
 // post to activities table, return the activity_id, and insert into availability table using activity_id
 module.exports = app.post('/', (req, res) => {
 
-    var date = req.body.date;
-    var time = req.body.time;
-
     var canEdit = transformTrueFalse(req.body.canEdit);
     var availableDates = createAvailableDates(req.body.dateTimes.startDate, req.body.dateTimes.endDate);
 
@@ -22,10 +19,10 @@ module.exports = app.post('/', (req, res) => {
       throw err; 
     }
 
-    var query = "INSERT INTO ??(??,??, ??, ??, ??) VALUES (?,?,?,?,?)";
+    var query = "INSERT INTO ??(??,??, ??, ??, ??, ??) VALUES (?,?,?,?,?,?)";
     var table = [
-      "activities", "activityName", "location", "ageRestriction", "price", "canEdit",
-      req.body.activityName, req.body.location, req.body.ageRestriction, req.body.price, canEdit
+      "activities", "activityName", "location", "ageRestriction", "price", "canEdit", "category",
+      req.body.activityName, req.body.location, req.body.ageRestriction, req.body.price, canEdit, req.body.category
     ];
     query = mysql.format(query, table);
 
@@ -85,7 +82,6 @@ module.exports = app.post('/', (req, res) => {
       //or for timestamp
       //range.push(i)
     }
-    console.log('range: ', range);
     return range;
   }
 
