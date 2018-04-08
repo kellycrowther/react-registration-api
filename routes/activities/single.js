@@ -38,9 +38,10 @@ module.exports = app.post('/', (req, res) => {
 
       var activityId = result.insertId;
       var quantity = req.body.quantity;
+      var time = req.body.dateTimes.time;
 
-      var availabilityTable = createAvailabilityTable(activityId, quantity, availableDates);
-      var date_query = "INSERT INTO availability (activity_id, date_time, quantity) VALUES ?";
+      var availabilityTable = createAvailabilityTable(activityId, quantity, availableDates, time);
+      var date_query = "INSERT INTO availability (activity_id, date, quantity, time) VALUES ?";
       
       //insert into availability using above parameters
       // availability table needs to be an array of arrays wrapped in an array e.g.: 
@@ -85,13 +86,14 @@ module.exports = app.post('/', (req, res) => {
     return range;
   }
 
-  function createAvailabilityTable(activityId, quantity, availableDates) {
+  function createAvailabilityTable(activityId, quantity, availableDates, time) {
     var table = [];
     for(var x = 0; x < availableDates.length; x++) {
       var group = [];
       group.push(activityId);
       group.push(availableDates[x]);
       group.push(quantity);
+      group.push(time);
       table.push(group);
     }
     return table;

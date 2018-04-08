@@ -7,7 +7,7 @@ var middleware = require('../../middleware/get-middleware');
 module.exports = app.get('/', (req, res) => {
 
     // simple query to make sure we are retrieving data from mysql
-    connection.query('SELECT * FROM activities', function (err, rows, fields) {
+    connection.query('SELECT * FROM availability JOIN activities ON availability.activity_id = activities.activity_id', function (err, rows, fields) {
         if (err) {
             console.log('error retrieving the data: ', err.stack);
             res.status(404).send(err.stack);
@@ -17,6 +17,8 @@ module.exports = app.get('/', (req, res) => {
         console.log('availableActivity is: ', rows[1].activityName);
 
         transformTrueFalse(rows);
+
+        transformDateToHumanReadable(rows);
 
         // response to procure for the get request
         res.status(200).json(rows);
@@ -32,5 +34,14 @@ function transformTrueFalse(data) {
         } else {
             data[x].canEdit = true;
         };
+    };
+}
+
+function transformDateToHumanReadable(data) {
+    for (let x = 0; x < data.length; x++) {
+        if (data[x].date) {
+            var readableDate = new Date(data[x].date);
+            data[x].date = readableDate.toLocaleDateString();
+        }
     };
 }
