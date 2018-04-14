@@ -7,82 +7,90 @@ var mysql = require('mysql');
 module.exports = app.post('/', (req, res) => {
 
     var canEdit = transformTrueFalse(req.body.canEdit);
-    var availableDates = createAvailableDates(req.body.dateTimes.startDate, req.body.dateTimes.endDate);
+    var availableDateTimes = createAvailableDateTimes(req.body.dateTimes);
 
-    // console.log('request: ', req.body.activityName);
+    // console.log('request: ', req.body);
     // res.status(200);
 
-  connection.beginTransaction(function (err) {
-    if (err) {
-      console.log('Begin Transaction Error: ', err);
-      res.json({ "Error": true, "Message": "Error executing beginTransaction" });
-      throw err; 
-    }
-
-    var query = "INSERT INTO ??(??,??, ??, ??, ??, ??) VALUES (?,?,?,?,?,?)";
-    var table = [
-      "activities", "activityName", "location", "ageRestriction", "price", "canEdit", "category",
-      req.body.activityName, req.body.location, req.body.ageRestriction, req.body.price, canEdit, req.body.category
-    ];
-    query = mysql.format(query, table);
-
-    // insert into activities table using above parameters
-    connection.query(query, function (err, result) {
+    connection.beginTransaction(function (err) {
       if (err) {
-        connection.rollback(function () {
-          console.log('Error: ', err);
-          res.json({ "Error": true, "Message": "Error executing acitvities table query" });
-          throw err;
-        });
+        console.log('Begin Transaction Error: ', err);
+        res.json({ "Error": true, "Message": "Error executing beginTransaction" });
+        throw err; 
       }
 
-      var activityId = result.insertId;
-      var quantity = req.body.quantity;
-      var time = req.body.dateTimes.time;
+      var query = "INSERT INTO ??(??,??, ??, ??, ??, ??) VALUES (?,?,?,?,?,?)";
+      var table = [
+        "activities", "activityName", "location", "ageRestriction", "price", "canEdit", "category",
+        req.body.activityName, req.body.location, req.body.ageRestriction, req.body.price, canEdit, req.body.category
+      ];
+      query = mysql.format(query, table);
 
-      var availabilityTable = createAvailabilityTable(activityId, quantity, availableDates, time);
-      var date_query = "INSERT INTO availability (activity_id, date, quantity, time) VALUES ?";
-      
-      //insert into availability using above parameters
-      // availability table needs to be an array of arrays wrapped in an array e.g.: 
-      // [ [ [...], [...], [...] ] ]
-      connection.query(date_query, [availabilityTable], function (err, result) {
+      // insert into activities table using above parameters
+      connection.query(query, function (err, result) {
         if (err) {
           connection.rollback(function () {
-            console.log('Availability Table Error: ', err);
-            res.json({ "Error": true, "Message": "Error executing availability table query" });
+            console.log('Error: ', err);
+            res.json({ "Error": true, "Message": "Error executing acitvities table query" });
             throw err;
           });
         }
-        connection.commit(function (err) {
+
+        var activityId = result.insertId;
+        var quantity = req.body.quantity;
+        var time = req.body.dateTimes.time;
+
+        var availabilityTable = createAvailabilityTable(activityId, quantity, availableDateTimes);
+        var date_query = "INSERT INTO availability (activity_id, date_time, quantity) VALUES ?";
+        
+        //insert into availability using above parameters
+        // availability table needs to be an array of arrays wrapped in an array e.g.: 
+        // [ [ [...], [...], [...] ] ]
+        connection.query(date_query, [availabilityTable], function (err, result) {
           if (err) {
             connection.rollback(function () {
-              console.log('Rollback Error: ', err);
-              res.json({ "Error": true, "Message": "Error executing rollback" });
+              console.log('Availability Table Error: ', err);
+              res.json({ "Error": true, "Message": "Error executing availability table query" });
               throw err;
             });
           }
-          console.log('Transaction Complete.');
-          res.json({ "Error": false, "Message": "Successful Addition!" });
+          connection.commit(function (err) {
+            if (err) {
+              connection.rollback(function () {
+                console.log('Rollback Error: ', err);
+                res.json({ "Error": true, "Message": "Error executing rollback" });
+                throw err;
+              });
+            }
+            console.log('Transaction Complete.');
+            res.json({ "Error": false, "Message": "Successful Addition!" });
+          });
         });
       });
     });
   });
-  });
 
   // create days in range
-  function createAvailableDates(startDate, endDate) {
-    startDate = new Date(startDate);
-    endDate = new Date(endDate);
-    var range = []
-    var mil = 86400000 //24h
-    for (var i = startDate.getTime(); i < endDate.getTime(); i = i + mil) {
+  function createAvailableDateTimes(dateTimes) {
+    let range = []
+    let mil = 86400000 //24h
+    // loop through dateTimes array to get individual object
+    for (let x = 0; x < dateTimes.length; x++) {
+      // combine the dates and times into one unit of data
+      let startDateTime = dateTimes[x].startDate + ' ' + dateTimes[x].time;
+      startDateTime = new Date(startDateTime);
+      let endDateTime = dateTimes[x].endDate + ' ' + dateTimes[x].time;
+      endDateTime = new Date(endDateTime);
+      // loop through the date range and put each day into the range array
+      for (let currentDateTime = startDateTime.getTime(); currentDateTime < endDateTime.getTime(); currentDateTime = currentDateTime + mil) {
 
-      range.push(new Date(i))
+        range.push(new Date(currentDateTime))
 
-      //or for timestamp
-      //range.push(i)
+        //or for timestamp
+        //range.push(i)
+      }
     }
+    console.log('range: ', range);
     return range;
   }
 
@@ -93,7 +101,6 @@ module.exports = app.post('/', (req, res) => {
       group.push(activityId);
       group.push(availableDates[x]);
       group.push(quantity);
-      group.push(time);
       table.push(group);
     }
     return table;

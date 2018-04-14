@@ -39,9 +39,10 @@ function transformTrueFalse(data) {
 
 function transformDateToHumanReadable(data) {
     for (let x = 0; x < data.length; x++) {
-        if (data[x].date) {
-            var readableDate = new Date(data[x].date);
+        if (data[x].date_time) {
+            var readableDate = new Date(data[x].date_time);
             data[x].date = readableDate.toLocaleDateString();
+            data[x].time = readableDate.toLocaleTimeString();
         }
     };
 }
