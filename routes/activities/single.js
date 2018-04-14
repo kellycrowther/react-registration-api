@@ -11,6 +11,7 @@ module.exports = app.post('/', (req, res) => {
 
     // console.log('request: ', req.body);
     // res.status(200);
+    // res.json({ "Error": false, "Message": "Successful Addition!" });
 
     connection.beginTransaction(function (err) {
       if (err) {
@@ -85,8 +86,14 @@ module.exports = app.post('/', (req, res) => {
       // loop through the date range and put each day into the dateTimeRange array
       // put the quantity into it's own quantity array
       for (let currentDateTime = startDateTime.getTime(); currentDateTime < endDateTime.getTime() + mil; currentDateTime = currentDateTime + mil) {
-        dateTimeRange.push(new Date(currentDateTime));
-        quantityRange.push(availability[x].quantity);
+        let currentDay = new Date(currentDateTime);
+        currentDay = currentDay.getDay();
+        // if includedWeekdays is less than 1, push every dateTime and quantity into appropriate array
+        // if the currentDay is included in the includedWeekdays array, push currentDateTime and quantity in appropriate array
+        if ((availability[x].includedWeekdays.length < 1) || (availability[x].includedWeekdays.includes(currentDay))) {
+          dateTimeRange.push(new Date(currentDateTime));
+          quantityRange.push(availability[x].quantity);
+        }
       }
     }
     // return array of values and access using index in availabilityTable
