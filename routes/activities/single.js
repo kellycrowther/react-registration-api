@@ -7,7 +7,7 @@ var mysql = require('mysql');
 module.exports = app.post('/', (req, res) => {
 
     var canEdit = transformTrueFalse(req.body.canEdit);
-    var availableDateTimes = createAvailableDateTimes(req.body.dateTimes);
+    var availabilityData = createAvailability(req.body.availability);
 
     // console.log('request: ', req.body);
     // res.status(200);
@@ -38,9 +38,9 @@ module.exports = app.post('/', (req, res) => {
 
         var activityId = result.insertId;
         var quantity = req.body.quantity;
-        var time = req.body.dateTimes.time;
-
-        var availabilityTable = createAvailabilityTable(activityId, quantity, availableDateTimes);
+        
+        // see return statement of createAvailability for mapping of index to values
+        var availabilityTable = createAvailabilityTable(activityId, availabilityData[1], availabilityData[0]);
         var date_query = "INSERT INTO availability (activity_id, date_time, quantity) VALUES ?";
         
         //insert into availability using above parameters
@@ -71,36 +71,35 @@ module.exports = app.post('/', (req, res) => {
   });
 
   // create days in range
-  function createAvailableDateTimes(dateTimes) {
-    let range = []
+  function createAvailability(availability) {
+    let dateTimeRange = [];
+    var quantityRange = [];
     let mil = 86400000 //24h
     // loop through dateTimes array to get individual object
-    for (let x = 0; x < dateTimes.length; x++) {
+    for (let x = 0; x < availability.length; x++) {
       // combine the dates and times into one unit of data
-      let startDateTime = dateTimes[x].startDate + ' ' + dateTimes[x].time;
+      let startDateTime = availability[x].startDate + ' ' + availability[x].time;
       startDateTime = new Date(startDateTime);
-      let endDateTime = dateTimes[x].endDate + ' ' + dateTimes[x].time;
+      let endDateTime = availability[x].endDate + ' ' + availability[x].time;
       endDateTime = new Date(endDateTime);
-      // loop through the date range and put each day into the range array
-      for (let currentDateTime = startDateTime.getTime(); currentDateTime < endDateTime.getTime(); currentDateTime = currentDateTime + mil) {
-
-        range.push(new Date(currentDateTime))
-
-        //or for timestamp
-        //range.push(i)
+      // loop through the date range and put each day into the dateTimeRange array
+      // put the quantity into it's own quantity array
+      for (let currentDateTime = startDateTime.getTime(); currentDateTime < endDateTime.getTime() + mil; currentDateTime = currentDateTime + mil) {
+        dateTimeRange.push(new Date(currentDateTime));
+        quantityRange.push(availability[x].quantity);
       }
     }
-    console.log('range: ', range);
-    return range;
+    // return array of values and access using index in availabilityTable
+    return [dateTimeRange, quantityRange];
   }
 
-  function createAvailabilityTable(activityId, quantity, availableDates, time) {
+  function createAvailabilityTable(activityId, quantity, availabilityData, time) {
     var table = [];
-    for(var x = 0; x < availableDates.length; x++) {
+    for (var x = 0; x < availabilityData.length; x++) {
       var group = [];
       group.push(activityId);
-      group.push(availableDates[x]);
-      group.push(quantity);
+      group.push(availabilityData[x]);
+      group.push(quantity[x]);
       table.push(group);
     }
     return table;
