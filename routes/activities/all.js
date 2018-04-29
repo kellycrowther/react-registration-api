@@ -4,7 +4,7 @@ var middleware = require('../../middleware/get-middleware');
 
 // this file pulls all information from the availableActivity table
 
-module.exports = app.get('/', (req, res) => {
+module.exports = (req, res) => {
 
     // simple query to make sure we are retrieving data from mysql
     connection.query('SELECT * FROM availability JOIN activities ON availability.activity_id = activities.activity_id', function (err, rows, fields) {
@@ -24,7 +24,7 @@ module.exports = app.get('/', (req, res) => {
         res.status(200).json(rows);
         // res.send(rows);
     });
-});
+};
 
 // transform from 0/1 to false/true respectively
 function transformTrueFalse(data) {

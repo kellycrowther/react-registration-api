@@ -4,7 +4,7 @@ var middleware = require('../../middleware/get-middleware');
 var mysql = require('mysql');
 
 // post to activities table, return the activity_id, and insert into availability table using activity_id
-module.exports = app.post('/', (req, res) => {
+module.exports = (req, res) => {
 
     var canEdit = transformTrueFalse(req.body.canEdit);
     var availabilityData = createAvailability(req.body.availability);
@@ -69,7 +69,7 @@ module.exports = app.post('/', (req, res) => {
         });
       });
     });
-  });
+  };
 
   // create days in range
   function createAvailability(availability) {
