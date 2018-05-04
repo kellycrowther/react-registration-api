@@ -4,12 +4,12 @@ var port = process.env.PORT || 3111;
 var router = express.Router();
 var bodyParser = require('body-parser');
 var routes = require('./routes');
-
 var passport = require('passport');
-var passportJWT = require('passport-jwt');
+var jwtConfig = require('./middleware/jwt-strategy.js');
 
-var ExtractJwt = passportJWT.ExtractJwt;
-var JwtStrategy = passportJWT.Strategy;
+passport.use(jwtConfig.strategy);
+
+app.use(passport.initialize());
 
 app.use(bodyParser.json());       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
@@ -18,6 +18,10 @@ app.use(bodyParser.urlencoded({     // to support URL-encoded bodies
 
 //  Connect all our routes to our application
 app.use('/', routes);
+
+app.get("/secret", passport.authenticate('jwt', {session: false}), function (req, res) {
+  res.status(200).json({ message: "Success! You can not see this without a token" });
+});
 
 // connect to the port
 app.listen(port);
