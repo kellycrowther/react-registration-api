@@ -19,7 +19,7 @@ module.exports = (req, res) => {
     var phone_number = req.body.phone_number;
     var zip_code = req.body.zip_code;
   } else {
-    res.status(422).json({"message": "you are missing a required field"});
+    return res.status(422).json({"message": "you are missing a required field"});
   }
 
   // transaction to find email in database and add user if email not in use
@@ -69,13 +69,13 @@ module.exports = (req, res) => {
               });
             }
             console.log('Add account successful');
-            res.status(200).json({ "message": "Successfully added an account" });
+            return res.status(200).json({ "message": "Successfully added an account" });
           });
         });
       } else {
         // if email already in use, reject the request
         console.log('Email already in use');
-        res.status(409).json({ "message": "Email already in use" });
+        return res.status(409).json({ "message": "Email already in use" });
       }
     });
 
