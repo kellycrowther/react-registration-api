@@ -10,8 +10,7 @@ var jwtConfig = require('../../middleware/jwt-strategy.js');
 module.exports = (req, res) => {
 
   // console.log('login: ', req.body);
-  // res.status(200);
-  // res.json({ "message": "login post route working" });
+  // res.status(200).json({ "message": "login post route working" });
 
   if(req.body.email && req.body.password) {
     var email = req.body.email;
@@ -23,12 +22,12 @@ module.exports = (req, res) => {
     if (err) {
       console.log('error retrieving the data: ', err.stack);
       res.status(404).send(err.stack);
-      throw err;
+      return err;
     }
 
     // if no email found
     if (!rows.length) {
-      res.status(401).json({"message": "no such email found"});
+      return res.status(401).json({"message": "no such email found"});
     }
 
     console.log('user: ', rows[0]);
@@ -37,9 +36,9 @@ module.exports = (req, res) => {
     if (candidatePassword === rows[0].password) {
       let payload = { account_id: rows[0].account_id };
       let token = jwt.sign(payload, jwtConfig.jwtOptions.secretOrKey);
-      res.status(200).json({"message": "passwords match", "token": token});
+      return res.status(200).json({"message": "passwords match", "token": token});
     } else {
-      res.status(401).json({"message": "passwords do not match"});
+      return res.status(401).json({"message": "passwords do not match"});
     }
   });
 };
