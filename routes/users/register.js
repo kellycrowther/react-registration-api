@@ -59,6 +59,8 @@ module.exports = (req, res) => {
             throw err;
           }
 
+          var account_id = result.insertId;
+
           // commit finalizes the transaction
           connection.commit(function (err) {
             if (err) {
@@ -68,8 +70,10 @@ module.exports = (req, res) => {
                 throw err;
               });
             }
+            let payload = { account_id: account_id };
+            let token = jwt.sign(payload, jwtConfig.jwtOptions.secretOrKey);
             console.log('Add account successful');
-            return res.status(200).json({ "message": "Successfully added an account" });
+            return res.status(200).json({ "message": "Successfully added an account", "token": token });
           });
         });
       } else {
