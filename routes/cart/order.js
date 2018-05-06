@@ -2,12 +2,17 @@ var app = require('../../server');
 var connection = require('../../mysql-server-connection');
 var mysql = require('mysql');
 
+// this file places an order for the customer,
+// adding an account_id for each activityIds to orders table
 module.exports = (req, res) => {
-  if(!req.body.account_id || !req.body.activityIds) {
-    return res.status(422).json({ "message":  "you are missing account_id or activity_id" });
+  // console.log('order body: ', req.user.account_id);
+  // res.status(200).json({"message": 'success'})
+  
+  if (!req.user.account_id || !req.body.activityIds) {
+    return res.status(422).json({ "message":  "you are missing account_id or activityIds" });
   }
 
-  var orderTable = createOrderTable(req.body.account_id, req.body.activityIds);
+  var orderTable = createOrderTable(req.user.account_id, req.body.activityIds);
   var order_query = "INSERT INTO orders (account_id, activity_id) VALUES ?";
 
   connection.query(order_query, [orderTable], function (err, result) {
