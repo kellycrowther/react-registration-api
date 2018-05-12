@@ -100,6 +100,8 @@ module.exports = (req, res) => {
     return [dateTimeRange, quantityRange];
   }
 
+// this relys on activityId and availabilityData array length
+// to be the same and the corresponding arrays match up with one another
   function createAvailabilityTable(activityId, quantity, availabilityData, time) {
     var table = [];
     for (var x = 0; x < availabilityData.length; x++) {

@@ -5,15 +5,15 @@ var mysql = require('mysql');
 // this file places an order for the customer,
 // adding an account_id for each activityIds to orders table
 module.exports = (req, res) => {
-  // console.log('order body: ', req.user.account_id);
-  // res.status(200).json({"message": 'success'})
+  // console.log('order body: ', req.body);
+  // res.status(200).json({"message": 'success'});
   
-  if (!req.user.account_id || !req.body.activityIds) {
-    return res.status(422).json({ "message":  "you are missing account_id or activityIds" });
+  if (!req.user.account_id || !req.body.activityIds || !req.body.availabilityIds) {
+    return res.status(422).json({ "message":  "you are missing account_id or activityIds or availabilityIds" });
   }
 
-  var orderTable = createOrderTable(req.user.account_id, req.body.activityIds);
-  var order_query = "INSERT INTO orders (account_id, activity_id) VALUES ?";
+  var orderTable = createOrderTable(req.user.account_id, req.body.activityIds, req.body.availabilityIds);
+  var order_query = "INSERT INTO orders (account_id, activity_id, availability_id) VALUES ?";
 
   connection.query(order_query, [orderTable], function (err, result) {
     if (err) {
@@ -27,12 +27,15 @@ module.exports = (req, res) => {
   });
 }
 
-function createOrderTable(account_id, activityIds) {
+// this relys on activityIds and availabilityIds array length
+// to be the same and the corresponding arrays match up with one another
+function createOrderTable(account_id, activityIds, availabilityIds) {
   let table = [];
   for (let x = 0; x < activityIds.length; x++) {
     let group = [];
     group.push(account_id);
     group.push(activityIds[x]);
+    group.push(availabilityIds[x]);
     table.push(group);
   }
   return table;
