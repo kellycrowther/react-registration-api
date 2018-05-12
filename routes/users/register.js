@@ -3,7 +3,7 @@ var connection = require('../../mysql-server-connection');
 var mysql = require('mysql');
 var jwt = require('jsonwebtoken');
 var jwtConfig = require('../../middleware/jwt-strategy.js');
-
+var bcrypt = require('bcryptjs');
 // this file adds an account to the database if the email is not already in use
 
 module.exports = (req, res) => {
@@ -43,10 +43,13 @@ module.exports = (req, res) => {
       // if no email found, add it to the database
       if (!rows.length) {
 
+        // hash password
+        let hashedPassword = bcrypt.hashSync(req.body.password, 10);
+
         var query = "INSERT INTO ??(??,??, ??, ??, ??, ??) VALUES (?,?,?,?,?,?)";
         var table = [
           "accounts", "first_name", "last_name", "email", "phone_number", "zip_code", "password",
-          req.body.first_name, req.body.last_name, req.body.email, req.body.phone_number, req.body.zip_code, req.body.password
+          req.body.first_name, req.body.last_name, req.body.email, req.body.phone_number, req.body.zip_code, hashedPassword
         ];
         query = mysql.format(query, table);
 

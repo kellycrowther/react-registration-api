@@ -3,6 +3,7 @@ var connection = require('../../mysql-server-connection');
 var mysql = require('mysql');
 var jwt = require('jsonwebtoken');
 var jwtConfig = require('../../middleware/jwt-strategy.js');
+var bcrypt = require('bcryptjs');
 
 // this file checks if there is a matching email and password 
 // and returns a json web token to client if so
@@ -33,7 +34,7 @@ module.exports = (req, res) => {
     console.log('user: ', rows[0]);
 
     // check if candidate password matches database password
-    if (candidatePassword === rows[0].password) {
+    if (bcrypt.compareSync(candidatePassword, rows[0].password)) {
       let payload = { account_id: rows[0].account_id };
       let token = jwt.sign(payload, jwtConfig.jwtOptions.secretOrKey);
       return res.status(200).json({"message": "passwords match", "token": token});
