@@ -7,23 +7,53 @@ var mysql = require('mysql');
 module.exports = (req, res) => {
   // console.log('order body: ', req.body);
   // res.status(200).json({"message": 'success'});
-  
-  if (!req.user.account_id || !req.body.activityIds || !req.body.availabilityIds) {
-    return res.status(422).json({ "message":  "you are missing account_id or activityIds or availabilityIds" });
-  }
 
-  var orderTable = createOrderTable(req.user.account_id, req.body.activityIds, req.body.availabilityIds);
-  var order_query = "INSERT INTO orders (account_id, activity_id, availability_id) VALUES ?";
-
-  connection.query(order_query, [orderTable], function (err, result) {
+  connection.beginTransaction(function (err) {
     if (err) {
-      connection.rollback(function () {
-        console.log('Order Error: ', err);
-        return res.status(500).json({ "Error": true, "Message": "Error executing order table query" });
-      });
+      console.log('Begin Transaction Error: ', err);
+      return res.status(500).json({ "Error": true, "Message": "Error executing beginTransaction" });
+      throw err;
+    }
+  
+    if (!req.user.account_id || !req.body.activityIds || !req.body.availabilityIds) {
+      return res.status(422).json({ "message":  "you are missing account_id or activityIds or availabilityIds" });
     }
 
-    return res.status(200).json({"message": "Successful order"});
+    // add order to orders table
+    var orderTable = createOrderTable(req.user.account_id, req.body.activityIds, req.body.availabilityIds);
+    var order_query = "INSERT INTO orders (account_id, activity_id, availability_id) VALUES ?";
+
+    connection.query(order_query, [orderTable], function (err, result) {
+      if (err) {
+        connection.rollback(function () {
+          console.log('Order Error: ', err);
+          return res.status(500).json({ "Error": true, "Message": "Error executing order table query" });
+        });
+      }
+
+      // update the availability table to have less quantity - parantheses required here
+      var availability_query = "UPDATE availability SET quantity = quantity - 1 WHERE availability_id IN (?)";
+      connection.query(availability_query, [req.body.availabilityIds], function(err, result) {
+        if (err) {
+          connection.rollback(function () {
+            console.log('Availability Error: ', err);
+            return res.status(500).json({ "Error": true, "Message": "Error executing availability table query" });
+          });
+        }
+
+        connection.commit(function (err) {
+          if (err) {
+            connection.rollback(function () {
+              console.log('Rollback Error: ', err);
+              return res.json({ "Error": true, "Message": "Error executing rollback" });
+              throw err;
+            });
+          }
+          console.log('Successful order');
+          return res.status(200).json({ "message": "Successful order" });
+        })
+      });
+    });
   });
 }
 
