@@ -46,10 +46,13 @@ module.exports = (req, res) => {
         // hash password
         let hashedPassword = bcrypt.hashSync(req.body.password, 10);
 
-        var query = "INSERT INTO ??(??,??, ??, ??, ??, ??) VALUES (?,?,?,?,?,?)";
+        // all roles begin as 'customer'
+        let role = 'customer';
+
+        var query = "INSERT INTO ??(??,??, ??, ??, ??, ??, ??) VALUES (?,?,?,?,?,?,?)";
         var table = [
-          "accounts", "first_name", "last_name", "email", "phone_number", "zip_code", "password",
-          req.body.first_name, req.body.last_name, req.body.email, req.body.phone_number, req.body.zip_code, hashedPassword
+          "accounts", "first_name", "last_name", "email", "phone_number", "zip_code", "password", "role",
+          req.body.first_name, req.body.last_name, req.body.email, req.body.phone_number, req.body.zip_code, hashedPassword, role
         ];
         query = mysql.format(query, table);
 

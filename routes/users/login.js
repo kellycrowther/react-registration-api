@@ -35,9 +35,18 @@ module.exports = (req, res) => {
 
     // check if candidate password matches database password
     if (bcrypt.compareSync(candidatePassword, rows[0].password)) {
-      let payload = { account_id: rows[0].account_id };
+      let role = rows[0].role;
+      let payload = {
+        account_id: rows[0].account_id,
+        role: role
+      };
+      // sign token and send role in body
       let token = jwt.sign(payload, jwtConfig.jwtOptions.secretOrKey);
-      return res.status(200).json({"message": "passwords match", "token": token});
+      return res.status(200).json({
+        "message": "passwords match",
+        "role": role,
+        "token": token
+      });
     } else {
       return res.status(401).json({"message": "passwords do not match"});
     }

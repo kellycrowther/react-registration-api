@@ -1,8 +1,10 @@
 var passportJWT = require('passport-jwt');
 var connection = require('../mysql-server-connection');
-var mysql = require('mysql');
 var ExtractJwt = passportJWT.ExtractJwt;
 var JwtStrategy = passportJWT.Strategy;
+
+// TODO: add expiration to token
+// TODO: change secretOrKey to random string
 
 var jwtOptions = {};
 jwtOptions.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
