@@ -42,7 +42,6 @@ module.exports = (req, res) => {
       let token = jwt.sign(payload, jwtConfig.jwtOptions.secretOrKey);
       return res.status(200).json({
         "message": "passwords match",
-        "role": role,
         "token": token
       });
     } else {
