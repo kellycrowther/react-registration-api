@@ -1,6 +1,4 @@
-var app = require('../../server');
 var connection = require('../../mysql-server-connection');
-var middleware = require('../../middleware/get-middleware');
 var mysql = require('mysql');
 
 // post to activities table, return the activity_id, and insert into availability table using activity_id

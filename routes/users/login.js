@@ -1,6 +1,4 @@
-var app = require('../../server');
 var connection = require('../../mysql-server-connection');
-var mysql = require('mysql');
 var jwt = require('jsonwebtoken');
 var jwtConfig = require('../../middleware/jwt-strategy.js');
 var bcrypt = require('bcryptjs');
