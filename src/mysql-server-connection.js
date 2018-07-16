@@ -1,5 +1,5 @@
 var mysql = require('mysql');
-var databaseConfig = require('./database-connection-config.json');
+var databaseConfig = require('../database-connection-config.json');
 var connection = mysql.createConnection(databaseConfig);
 
 // connect to the database and catch any errors
