@@ -4,7 +4,7 @@
   "description": "api for the BBR react-registration api",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon ./server.js"
+    "start": "nodemon ./src/server.js"
   },
   "author": "Kelly Crowther",
   "license": "MIT",
