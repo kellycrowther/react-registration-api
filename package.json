@@ -4,7 +4,8 @@
   "description": "api for the BBR react-registration api",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon ./src/server.js"
+    "start": "gulp",
+    "tsc": "tsc"
   },
   "author": "Kelly Crowther",
   "license": "MIT",
@@ -15,6 +16,7 @@
     "typescript": "2.9.2"
   },
   "dependencies": {
+    "@types/mysql": "^2.15.5",
     "bcryptjs": "2.4.3",
     "body-parser": "1.18.2",
     "cors": "2.8.4",
@@ -22,6 +24,7 @@
     "jsonwebtoken": "8.2.1",
     "mysql": "2.15.0",
     "passport": "0.4.0",
-    "passport-jwt": "4.0.0"
+    "passport-jwt": "4.0.0",
+    "ts-node": "7.0.0"
   }
 }
