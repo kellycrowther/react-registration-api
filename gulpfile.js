@@ -26,7 +26,7 @@ gulp.task("build:scripts", function () {
 
 gulp.task('server', () => {
   // needed setTimeout to get rid of bug where server wasn't picking up new build
-  setTimeout(startServer, 10);
+  setTimeout(startServer, 150);
 });
 
 gulp.task("watch", ["build:scripts", "server"], () => {
