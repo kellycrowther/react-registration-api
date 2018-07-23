@@ -1,42 +1,45 @@
-import { IObjectResponse } from '../../models/sql';
 import * as express from 'express';
 import * as mysql from 'mysql';
+import { IObjectResponse } from '../../models/sql';
+import { DataTransformationService } from '../../services/data-transformation';
 var connection = require('../../mysql-server-connection');
 
 // put to activities table - update an activity
-module.exports = (req: express.Request, res: express.Response) => {
-  console.log('REQUEST: ', req.body);
-  // res.status(200).json({ "Error": false, "Message": "Successful Update" });
+export module Route {
+  export class UpdateActivity {
 
-  let canEdit = transformTrueFalse(req.body.canEdit);
+    public update(req: express.Request, res: express.Response) {
+      console.info('Activities->update()', req.body);
+      // res.status(200).json({ "Error": false, "Message": "Successful Update" });
 
-  let query = "UPDATE activities SET activityName = ?, location = ?, ageRestriction = ?, price = ?, canEdit = ?, category = ? WHERE activity_id = ?";
-  let table = [
-    req.body.activityName,
-    req.body.location,
-    req.body.ageRestriction,
-    req.body.price,
-    canEdit,
-    req.body.category,
-    req.body.activity_id
-  ];
+      let dataTransformationService = new DataTransformationService();
 
-  query = mysql.format(query, table);
+      let canEdit = dataTransformationService.transformTrueFalse(req.body.canEdit);
 
-  // insert into activities table using above parameters
-  connection.query(query, function (err: Error, result: IObjectResponse) {
-    if (err) {
-      connection.rollback(function () {
-        console.log('Error: ', err);
-        res.json({ "Error": true, "Message": "Error executing acitvities table query" });
-        throw err;
+      let query = "UPDATE activities SET activityName = ?, location = ?, ageRestriction = ?, price = ?, canEdit = ?, category = ? WHERE activity_id = ?";
+      let table = [
+        req.body.activityName,
+        req.body.location,
+        req.body.ageRestriction,
+        req.body.price,
+        canEdit,
+        req.body.category,
+        req.body.activity_id
+      ];
+
+      query = mysql.format(query, table);
+
+      // update activities table using above parameters
+      connection.query(query, function (err: Error, result: IObjectResponse) {
+        if (err) {
+          connection.rollback(function () {
+            console.log('Error: ', err);
+            res.json({ "Error": true, "Message": "Error executing acitvities table query" });
+            throw err;
+          });
+        }
+        res.status(200).json({ "Error": false, "Message": "Successfully updated record." });
       });
     }
-    console.log(JSON.stringify(result) + " record(s) updated");
-    res.status(200).json({ "Error": false, "Message": "Successfully updated record." });
-  });
-};
-
-function transformTrueFalse(canEdit: boolean) {
-  return (canEdit ? 1 : 0);
+  }
 }
