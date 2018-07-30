@@ -11,10 +11,10 @@ module.exports = (req, res) => {
     // res.status(200);
     // res.json({ "Error": false, "Message": "Successful Addition!" });
 
-    connection.beginTransaction(function (err) {
+    connection.beginTransaction((err) => {
       if (err) {
-        console.log('Begin Transaction Error: ', err);
-        res.json({ "Error": true, "Message": "Error executing beginTransaction" });
+        console.info('Begin Transaction Post to Activities Error: ', err);
+        res.json({ "Error": true, "Message": "Error executing beginTransaction for post to activity" });
         throw err; 
       }
 
@@ -26,11 +26,11 @@ module.exports = (req, res) => {
       query = mysql.format(query, table);
 
       // insert into activities table using above parameters
-      connection.query(query, function (err, result) {
+      connection.query(query, (err, result) => {
         if (err) {
-          connection.rollback(function () {
-            console.log('Error: ', err);
-            res.json({ "Error": true, "Message": "Error executing acitvities table query" });
+          connection.rollback(() => {
+            console.info('Error Posting Activity: ', err);
+            res.json({ "Error": true, "Message": "Error posting to acitvities table" });
             throw err;
           });
         }
@@ -45,24 +45,24 @@ module.exports = (req, res) => {
         //insert into availability using above parameters
         // availability table needs to be an array of arrays wrapped in an array e.g.: 
         // [ [ [...], [...], [...] ] ]
-        connection.query(date_query, [availabilityTable], function (err, result) {
+        connection.query(date_query, [availabilityTable], (err, result) => {
           if (err) {
-            connection.rollback(function () {
-              console.log('Availability Table Error: ', err);
-              res.json({ "Error": true, "Message": "Error executing availability table query" });
+            connection.rollback(() => {
+              console.info('Post To Availability Table Error: ', err);
+              res.json({ "Error": true, "Message": "Error executing post to availability table query" });
               throw err;
             });
           }
-          connection.commit(function (err) {
+          connection.commit((err) => {
             if (err) {
-              connection.rollback(function () {
-                console.log('Rollback Error: ', err);
-                res.json({ "Error": true, "Message": "Error executing rollback" });
+              connection.rollback(() => {
+                console.info('Rollback Error Post to Availability Table: ', err);
+                res.json({ "Error": true, "Message": "Error executing post to availability table rollback" });
                 throw err;
               });
             }
-            console.log('Transaction Complete.');
-            res.json({ "Error": false, "Message": "Successful Addition!" });
+            console.info('Post Activity Transaction Complete.');
+            res.staus(200).json({ "Error": false, "Message": "Successful Addition!" });
           });
         });
       });
