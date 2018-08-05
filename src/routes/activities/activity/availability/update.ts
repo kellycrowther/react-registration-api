@@ -1,8 +1,8 @@
 import * as express from 'express';
 import * as mysql from 'mysql';
-import { IObjectResponse } from '../../models/sql';
-import { DataTransformationService } from '../../services/data-transformation';
-var connection = require('../../mysql-server-connection');
+import { IObjectResponse } from '../../../../models/sql';
+import { DataTransformationService } from '../../../../services/data-transformation';
+var connection = require('../../../../mysql-server-connection');
 
 // put to activities table - update an activity
 export module Route {
@@ -32,7 +32,7 @@ export module Route {
           req.body.price,
           canEdit,
           req.body.category,
-          req.body.activity_id
+          req.params.activityId
         ];
 
         query = mysql.format(query, table);
@@ -51,7 +51,7 @@ export module Route {
           let availability_table = [
             dateTime,
             req.body.quantity,
-            req.body.availability_id
+            req.params.availabilityId
           ];
 
           availability_query = mysql.format(availability_query, availability_table);
