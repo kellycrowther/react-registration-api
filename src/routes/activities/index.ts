@@ -1,15 +1,15 @@
 const activities = require('express').Router();
-const all = require('./all');
-const single = require('./single');
+const get = require('./get');
+const post = require('./post');
 const activity = require('./activity');
-var passport = require('passport');
-var authorize = require('../../middleware/authorize');
+// var passport = require('passport');
+// var authorize = require('../../middleware/authorize');
 import * as updateRoute from './activity/availability/update';
 
 let update: updateRoute.Route.UpdateActivity = new updateRoute.Route.UpdateActivity();
 
-activities.get('/', all);
-activities.post('/', passport.authenticate('jwt', { session: false }), authorize.authorize, single);
+activities.get('/', get);
+activities.post('/', post);
 activities.put('/:activityId/availability/:availabilityId', update.update.bind(update.update));
 activities.delete('/:activityId', activity);
 

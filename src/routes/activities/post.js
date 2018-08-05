@@ -62,7 +62,7 @@ module.exports = (req, res) => {
               });
             }
             console.info('Post Activity Transaction Complete.');
-            res.staus(200).json({ "Error": false, "Message": "Successful Addition!" });
+            res.status(200).json({ "Error": false, "Message": "Successful Addition!" });
           });
         });
       });
